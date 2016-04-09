@@ -8,9 +8,9 @@ nginx:
 dnsmasq:
   image: andyshinn/dnsmasq
   ports:
-    - "192.168.99.200:53:53/tcp"
-    - "192.168.99.200:53:53/udp"
+    - "192.168.99.100:53:53/tcp"
+    - "192.168.99.100:53:53/udp"
   cap_add:
     - NET_ADMIN
-  command: --address=/dev/192.168.99.200
+  command: --address=/dev/192.168.99.100
   restart: always
