@@ -65,23 +65,32 @@ HEREDOC
     if args.empty?
       puts `docker-machine --help`.gsub(/Restart a machine/, "Restart a machine\n  resume                Resume a machine that has been paused by the host")
     elsif args[0] == 'env'
-      output = run_with_timeout('docker-machine env dev', 2.0, 0.3)
+      output = run_with_timeout('docker-machine env cte', 2.0, 0.3)
       if output.include? "Process timed out"
-        $stderr.puts "An error occured loading the dev configuration, probably because the VM is still booting. Try again later with dev machine env"
+        $stderr.puts "An error occured loading the cte configuration, probably because the VM is still booting. Try again later with cte machine env"
       elsif output.include? "is not running"
-        $stderr.puts output.gsub(/docker-machine (\w*) dev/, "dev machine \\1")
+        $stderr.puts output.gsub(/docker-machine (\w*) cte/, "cte machine \\1")
       else
         puts output
       end
     elsif args[0] == 'resume'
-      system('VBoxManage startvm dev --type headless')
+      system('VBoxManage startvm cte --type headless')
     elsif args[0] == 'create'
-      system('docker-machine create --driver virtualbox --engine-opt dns=192.168.99.100 --engine-opt dns=8.8.8.8 --engine-opt dns=8.8.4.4 dev')
-      system('docker-machine scp /usr/local/dev-env/docker/bootsync.sh dev:/tmp/bootsync.sh')
-      system('docker-machine ssh dev "sudo mv /tmp/bootsync.sh /var/lib/boot2docker/bootsync.sh"')
-      system('docker-machine restart dev')
+      system('docker-machine create --driver virtualbox --engine-opt dns=192.168.99.100 --engine-opt dns=8.8.8.8 --engine-opt dns=8.8.4.4 cte')
+
+      system('docker-machine scp /usr/local/dev-env/docker/bootsync.sh cte:/tmp/bootsync.sh')
+      system('docker-machine ssh cte "sudo mv /tmp/bootsync.sh /var/lib/boot2docker/bootsync.sh"')
+
+      system('docker-machine scp /usr/local/dev-env/docker/dctc_dev_registry.crt cte:/tmp/dctc_dev_registry.crt')
+      system('docker-machine ssh cte "sudo mkdir /var/lib/boot2docker/certs"')
+      system('docker-machine ssh cte "sudo mv /tmp/dctc_dev_registry.crt /var/lib/boot2docker/certs/"')
+
+      system('docker-machine scp /usr/local/dev-env/docker/bootlocal.sh cte:/tmp/bootlocal.sh')
+      system('docker-machine ssh cte "sudo mv /tmp/bootlocal.sh /var/lib/boot2docker/bootlocal.sh"')
+
+      system('docker-machine restart cte')
     else
-      args.push('dev') unless !args[1].nil? or ["ls", "help", "active", "create", "scp"].include?(args[0])
+      args.push('cte') unless !args[1].nil? or ["ls", "help", "active", "create", "scp"].include?(args[0])
       args.unshift('docker-machine')
       system(args.join(' '))
     end
