@@ -81,12 +81,11 @@ HEREDOC
       system('docker-machine scp /usr/local/dev-env/docker/bootsync.sh cte:/tmp/bootsync.sh')
       system('docker-machine ssh cte "sudo mv /tmp/bootsync.sh /var/lib/boot2docker/bootsync.sh"')
 
-      system('docker-machine scp /usr/local/dev-env/docker/dctc_dev_registry.crt cte:/tmp/dctc_dev_registry.crt')
-      system('docker-machine ssh cte "sudo mkdir /var/lib/boot2docker/certs"')
-      system('docker-machine ssh cte "sudo mv /tmp/dctc_dev_registry.crt /var/lib/boot2docker/certs/"')
+      system('docker-machine scp /usr/local/dev-env/docker/dctc_dev_registry.pem cte:/tmp/dctc_dev_registry.pem')
+      system('docker-machine ssh cte "sudo mkdir -p /var/lib/boot2docker/certs"')
+      system('docker-machine ssh cte "sudo mv /tmp/dctc_dev_registry.pem /var/lib/boot2docker/certs/"')
 
-      system('docker-machine scp /usr/local/dev-env/docker/bootlocal.sh cte:/tmp/bootlocal.sh')
-      system('docker-machine ssh cte "sudo mv /tmp/bootlocal.sh /var/lib/boot2docker/bootlocal.sh"')
+      system('docker-machine ssh cte "sudo /etc/rc.d/install_ca_certs"')
 
       system('docker-machine restart cte')
     else
